@@ -1,37 +1,14 @@
+import asyncio
 from flask import Flask, Response
 import mariadb
 
 from flask_mongoengine import MongoEngine
 
-from celery import Celery
+
 
 # create flask app 
 app = Flask(__name__)
 app.config['DEBUG'] = True
-
-# Celery Configuration
-def make_celery(app):
-    celery = Celery(
-        app.import_name,
-        backend=app.config['CELERY_RESULT_BACKEND'],
-        broker=app.config['CELERY_BROKER_URL']
-    )
-    celery.conf.update(app.config)
-
-    class ContextTask(celery.Task):
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery
-
-# celery
-app.config.update(
-    CELERY_BROKER_URL='redis://localhost:6379',
-    CELERY_RESULT_BACKEND='redis://localhost:6379'
-)
-celery = make_celery(app)
 
 # Mariadb Configuration 
 config = {
@@ -57,8 +34,8 @@ class Employee(db.Document):
     name = db.StringField()
     age = db.IntField()
 
-@celery.task
-def migrate_data():
+
+async def migrate_data():
     # connection for mariadb 
     connection = mariadb.connect(**config)
     
@@ -80,7 +57,7 @@ def migrate_data():
 @app.route('/migrate/employee', methods=['GET'])
 def index():
     # call the async task 
-    migrate_data.delay()
+    asyncio.run(migrate_data())
     # return the results!
     return Response({},200)
     
