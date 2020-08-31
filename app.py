@@ -10,9 +10,18 @@ from flask_mongoengine import MongoEngine
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
-# Mariadb Configuration 
+# Mariadb Configuration
+# ---- local
+# config = {
+#     'host': '127.0.0.1',
+#     'port': 3306,
+#     'user': 'ahmedsamir',
+#     'password': 'password1',
+#     'database': 'employees'
+# }
+# using docker
 config = {
-    'host': '127.0.0.1',
+    'host': 'db',
     'port': 3306,
     'user': 'ahmedsamir',
     'password': 'password1',
@@ -110,16 +119,21 @@ async def migrate_data():
 
 # async call 
 # return 200 status code 
+@app.route('/check', methods=['GET'])
+def check():
+    return Response({"Success OK"},200)# async call
+
+# return 200 status code
 @app.route('/migrate/employee', methods=['GET'])
 def index():
-    # call the async task 
+    # call the async task
     asyncio.run(migrate_data())
     # return the results!
     return Response({"Processing... Please wait"},200)
     
 @app.route('/showmongodb/employee/<page>/<offset>', methods=['GET'])
 def show_mongodb_docs(page, offset):
-
+    # ToDO: set adefault value for page & offset if they are None
     paginated_employees_data = Employee.objects.paginate(page=int(page), per_page=int(offset)).items
 
     json_data = []

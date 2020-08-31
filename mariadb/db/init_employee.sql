@@ -1,0 +1,2 @@
+-- create table employee
+--- insert data in employee

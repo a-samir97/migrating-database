@@ -12,6 +12,11 @@ services:
   db:
     restart: always
     image: mariadb:10.3
+    volumes:
+      - ./mariadb/db:/docker-entrypoint-initdb.d
+      - ./mariadb/data:/var/lib/mysql
+      - ./mariadb/mysql_log:/var/log/mysql
+      - ./mariadb/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
     ports:
       - "3307:3306"
     environment:
