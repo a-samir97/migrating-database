@@ -1,6 +1,6 @@
-FROM python:3.8-alpine
+FROM python:3.8
 WORKDIR /code
-RUN apk add --no-cache gcc musl-dev linux-headers mariadb-dev build-base python3-dev gcc
+RUN apt-get update && apt-get -y install python3-dev libssl-dev
 ENV FLASK_APP app.py
 ENV FLASK_RUN_HOST 0.0.0.0
 COPY requirements.txt requirements.txt

@@ -8,3 +8,14 @@ services:
       - .:/code
     environment:
       FLASK_ENV: development
+
+  db:
+    restart: always
+    image: mariadb:10.3
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: employees
+      MYSQL_USER: ahmedsamir
+      MYSQL_PASSWORD: password1
