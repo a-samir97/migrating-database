@@ -1,6 +1,7 @@
 1- read connection params or keys from environmet
 2- make sure to map every thing in mariadb composer service
-3- make a funciton to execute query to mysql in python
-4- make route file as a seperate file
-5- add mongodb to docker composer
-6- user query param with sql query to validate injection
+
+3- make a funciton to execute query to mysql in python (DONE)
+4- make route file as a seperate file (DONE)
+5- add mongodb to docker composer (DONE)
+6- user query param with sql query to validate injection (DONE)
