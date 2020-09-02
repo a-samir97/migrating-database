@@ -8,6 +8,11 @@ services:
       - .:/code
     environment:
       FLASK_ENV: docker_development
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+      - db
 
   db:
     restart: always
@@ -26,10 +31,14 @@ services:
       MYSQL_PASSWORD: password1
 
   mongodb:
-    image: mongo:4.0.8
+    image: mongo:latest
+    volumes:
+      - ./mongodb/data:/data/db
     ports:
-      - "27017"
+      - 27017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
       MONGO_INITDB_DATABASE: employees
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+
