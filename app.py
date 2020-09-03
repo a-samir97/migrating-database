@@ -7,11 +7,12 @@ import os
 
 # create flask app 
 app = Flask(__name__)
+app.debug = True
 
 if os.environ.get('FLASK_ENV') == 'docker_development':
     app.config.from_object(DockerDevelopmentConfig)
     app.config["MONGODB_SETTINGS"] = DockerDevelopmentConfig.MONGODB_SETTINGS
-
+   
 elif os.environ.get('FLASK_ENV') == 'local_development':
     app.config.from_object(LocalDevelopmentConfig)
     app.config["MONGODB_SETTINGS"] = LocalDevelopmentConfig.MONGODB_SETTINGS
@@ -26,4 +27,4 @@ app.register_blueprint(employees_routes, url_prefix='/')
 
 if __name__ == "__main__":
     # run app
-    app.run(debug=True)
+    app.run()

@@ -8,6 +8,7 @@ services:
       - .:/code
     environment:
       FLASK_ENV: docker_development
+      FLASK_DEBUG: 1
     links:
       - mongodb
     depends_on:
@@ -40,5 +41,5 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
       MONGO_INITDB_DATABASE: employees
-    command: mongod --smallfiles --logpath=/dev/null # --quiet
+    #command: mongod --smallfiles --logpath=/dev/null # --quiet
 

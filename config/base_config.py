@@ -6,9 +6,11 @@ class DockerDevelopmentConfig(Config):
     DEBUG = True
     
     MONGODB_SETTINGS = {
-        'db': 'employee',
+        'db': 'admin',
         'host': 'mongodb',
-        'port': 27017
+        'port': 27017,
+        'username':'root',
+        'password':'root'
     }
 
     MARIA_CONFIG = {
