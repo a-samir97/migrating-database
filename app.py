@@ -1,7 +1,10 @@
 from flask import Flask
-from routes.employee import employees_routes
-from config.base_config import DockerDevelopmentConfig, LocalDevelopmentConfig, TestingConfig
-from mongodb.init_db import db
+
+from migrate_tools.routes.employee import employees_routes
+from migrate_tools.routes.database import database_routes
+
+from migrate_tools.config.base_config import DockerDevelopmentConfig, LocalDevelopmentConfig, TestingConfig
+from migrate_tools.mongodb.init_db import db
 
 import os 
 
@@ -22,7 +25,7 @@ else:
 
 db.init_app(app)
 
-
+# employees routes 
 app.register_blueprint(employees_routes, url_prefix='/')
 
 if __name__ == "__main__":
