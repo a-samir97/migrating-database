@@ -1,7 +1,9 @@
 class Config(object):
     DEBUG = True
     TESTING = False
-    
+    SECRET_KEY = "@#$(&)&wejkfkwgeigwef2@#$@#(4"
+
+
 class DockerDevelopmentConfig(Config):
     DEBUG = True
     

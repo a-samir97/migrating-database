@@ -1,12 +1,11 @@
-from flask import Blueprint, request, Response, jsonify
+from flask import Blueprint, request, Response, jsonify, session
 from backend.database.connection import connect_database
 
 # create blueprint for database routes 
 database_routes = Blueprint('database_routes', __name__)
 
-# inital CONNECTION variable None
-connection = None
-TYPE = None
+# inital CONNECTION Dict to hold the connection
+connection_dict = {}
 
 @database_routes.route('config', methods=['POST'])
 def database_configuration():
@@ -31,10 +30,10 @@ def database_configuration():
         }
 
         # make connection, this function will return the connection
-        connection = connect_database('postgres', POSTGRES_CONFIG)
-        TYPE = 'postgres'
+        connection_dict['connection'] = connect_database('postgres', POSTGRES_CONFIG)
+        session['type'] = 'postgres'
 
-        return Response(status=200)
+        return Response("Postgres is connected successfully!", status=200)
 
     elif data.get('type') == 'mariadb':
 
@@ -48,10 +47,10 @@ def database_configuration():
         }    
 
         # make connection, this function will return the connection
-        connection = connect_database('mariadb', MARIA_CONFIG)
-        TYPE = 'mariadb'
+        connection_dict['connection'] = connect_database('mariadb', MARIA_CONFIG)
+        session['type'] = 'mariadb'
 
-        return Response(status=200)
+        return Response("Mariadb is connected successfully!",status=200)
 
     elif data.get('type') == 'mysql':
         # use pymysql library to connect to mysql database
@@ -65,24 +64,25 @@ def database_configuration():
         }
         
         # make connection, this function will return the connection
-        connection = connect_database('mysql', MYSQL_CONFIG)
-        TYPE = 'mysql'
+        connection_dict['connection'] = connect_database('mysql', MYSQL_CONFIG)
+        session['type'] = 'mysql'
 
-        return Response(status=200)
+        return Response("MySQL is connected successfully!", status=200)
 
     else:
         return Response(status=404)
 
-
+@database_routes.route('all-tables', methods=['GET'])
 def get_all_tables():
 
-    if connection is None or TYPE is None:
-        return Response(status=400)
+    if connection_dict.get('connection') is None or session.get('type') is None:
+        print(connection_dict.get('connection'), session.get('type'))
+        return Response("There is something not valid, please make your configuration",status=400)
     
     
-    cur = connection.cursor()
+    cur = connection_dict['connection'].cursor()
 
-    if TYPE == 'postgres':
+    if session['type'] == 'postgres':
 
         cur.execute("SELECT tablename\
             FROM pg_catalog.pg_tables\
@@ -93,9 +93,9 @@ def get_all_tables():
         cur.execute('SHOW TABLES;')
 
     all_tables = cur.fetchall()
-
+    
     cur.close()
 
     # convert data to json 
     
-    return Response(jsonify(all_tables), status=200)
+    return jsonify(all_tables)

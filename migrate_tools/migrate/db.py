@@ -9,11 +9,11 @@ def executequery(sql="",params=[]):
 
     # connection for mariadb
     if os.environ.get("FLASK_ENV") == 'docker_development':
-        from config.base_config import DockerDevelopmentConfig
+        from migrate_tools.config.base_config import DockerDevelopmentConfig
         MARIA_CONFIG = DockerDevelopmentConfig.MARIA_CONFIG
 
     elif os.environ.get("FLASK_ENV") == 'local_development':
-        from config.base_config import LocalDevelopmentConfig
+        from migrate_tools.config.base_config import LocalDevelopmentConfig
         MARIA_CONFIG = LocalDevelopmentConfig.MARIA_CONFIG
 
     connection = mariadb.connect(**MARIA_CONFIG)
