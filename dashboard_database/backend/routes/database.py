@@ -1,5 +1,5 @@
 from flask import Blueprint, request, Response, jsonify, session
-from backend.database.connection import connect_database
+from dashboard_database.backend.database.connection import connect_database
 
 # create blueprint for database routes 
 database_routes = Blueprint('database_routes', __name__)

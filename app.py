@@ -1,7 +1,7 @@
 from flask import Flask
 
 from migrate_tools.routes.employee import employees_routes
-from backend.routes.database import database_routes
+from dashboard_database.backend.routes.database import database_routes
 
 from migrate_tools.config.base_config import DockerDevelopmentConfig, LocalDevelopmentConfig, TestingConfig
 from migrate_tools.mongodb.init_db import db
