@@ -76,7 +76,6 @@ def database_configuration():
 def get_all_tables():
 
     if connection_dict.get('connection') is None or session.get('type') is None:
-        print(connection_dict.get('connection'), session.get('type'))
         return Response("There is something not valid, please make your configuration",status=400)
     
     
@@ -99,3 +98,23 @@ def get_all_tables():
     # convert data to json 
     
     return jsonify(all_tables)
+
+@database_routes.route('table-details/<table_name>', methods=['GET'])
+def get_table_details(table_name):
+
+    if connection_dict.get('connection') is None or session.get('type') is None:
+        return Response("There is something not valid, please make your configuration",status=400)
+
+    cur = connection_dict['connection'].cursor()
+
+    if session['type'] == 'postgres':
+        
+        cur.execute("select column_name from information_schema.columns where table_schema='public' and \
+            table_name='%s';" % table_name)
+
+    else:
+        cur.execute('SHOW COLUMNS FROM %s;' % table_name)
+
+    all_columns = cur.fetchall()
+
+    return jsonify(all_columns)
