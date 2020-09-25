@@ -1,5 +1,6 @@
 from flask import Blueprint, request, Response, jsonify, session
 from dashboard_database.backend.database.connection import connect_database
+from flask_cors import cross_origin
 
 # create blueprint for database routes 
 database_routes = Blueprint('database_routes', __name__)
@@ -8,6 +9,7 @@ database_routes = Blueprint('database_routes', __name__)
 connection_dict = {}
 
 @database_routes.route('config', methods=['POST'])
+@cross_origin()
 def database_configuration():
     '''
         Database configuration in runtime.
@@ -118,3 +120,31 @@ def get_table_details(table_name):
     all_columns = cur.fetchall()
 
     return jsonify(all_columns)
+
+
+@database_routes.route('<table_name>/insert', methods=['POST'])
+def insert_row(table_name):
+
+    if connection_dict.get('connection') is None or session.get('type') is None:
+        return Response("There is something not valid, please make your configuration",status=400)
+
+
+@database_routes.route('<table_name>/delete', methods=['DELETE'])
+def delete_row(table_name):
+
+    if connection_dict.get('connection') is None or session.get('type') is None:
+        return Response("There is something not valid, please make your configuration",status=400)
+
+
+@database_routes.route('<table_name>/update', methods=['PUT'])
+def update_row(table_name):
+
+    if connection_dict.get('connection') is None or session.get('type') is None:
+        return Response("There is something not valid, please make your configuration",status=400)
+
+
+@database_routes.route('<table_name>/search', methods=['GET'])
+def search(table_name):
+
+    if connection_dict.get('connection') is None or session.get('type') is None:
+        return Response("There is something not valid, please make your configuration",status=400)
