@@ -1,4 +1,4 @@
-from flask import Blueprint, request, Response, jsonify, session
+from flask import Blueprint, request, Response, jsonify
 from dashboard_database.backend.database.connection import connect_database
 from flask_cors import cross_origin
 
@@ -33,7 +33,7 @@ def database_configuration():
 
         # make connection, this function will return the connection
         connection_dict['connection'] = connect_database('postgres', POSTGRES_CONFIG)
-        session['type'] = 'postgres'
+        connection_dict['type'] = 'postgres'
 
         return Response("Postgres is connected successfully!", status=200)
 
@@ -50,7 +50,7 @@ def database_configuration():
 
         # make connection, this function will return the connection
         connection_dict['connection'] = connect_database('mariadb', MARIA_CONFIG)
-        session['type'] = 'mariadb'
+        connection_dict['type'] = 'mariadb'
 
         return Response("Mariadb is connected successfully!",status=200)
 
@@ -67,7 +67,7 @@ def database_configuration():
         
         # make connection, this function will return the connection
         connection_dict['connection'] = connect_database('mysql', MYSQL_CONFIG)
-        session['type'] = 'mysql'
+        connection_dict['type'] = 'mysql'
 
         return Response("MySQL is connected successfully!", status=200)
 
@@ -75,15 +75,18 @@ def database_configuration():
         return Response(status=404)
 
 @database_routes.route('all-tables', methods=['GET'])
+@cross_origin()
 def get_all_tables():
 
-    if connection_dict.get('connection') is None or session.get('type') is None:
+    print(connection_dict.get('connection'), connection_dict.get('type'))
+
+    if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
     
     
     cur = connection_dict['connection'].cursor()
 
-    if session['type'] == 'postgres':
+    if connection_dict['type'] == 'postgres':
 
         cur.execute("SELECT tablename\
             FROM pg_catalog.pg_tables\
@@ -102,14 +105,15 @@ def get_all_tables():
     return jsonify(all_tables)
 
 @database_routes.route('table-details/<table_name>', methods=['GET'])
+@cross_origin()
 def get_table_details(table_name):
 
-    if connection_dict.get('connection') is None or session.get('type') is None:
+    if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
 
     cur = connection_dict['connection'].cursor()
 
-    if session['type'] == 'postgres':
+    if connection_dict['type'] == 'postgres':
         
         cur.execute("select column_name from information_schema.columns where table_schema='public' and \
             table_name='%s';" % table_name)
@@ -118,33 +122,34 @@ def get_table_details(table_name):
         cur.execute('SHOW COLUMNS FROM %s;' % table_name)
 
     all_columns = cur.fetchall()
-
+    # for react 
+    all_columns = [{'title': x} for x in all_columns ]
     return jsonify(all_columns)
 
 
 @database_routes.route('<table_name>/insert', methods=['POST'])
 def insert_row(table_name):
 
-    if connection_dict.get('connection') is None or session.get('type') is None:
+    if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
 
 
 @database_routes.route('<table_name>/delete', methods=['DELETE'])
 def delete_row(table_name):
 
-    if connection_dict.get('connection') is None or session.get('type') is None:
+    if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
 
 
 @database_routes.route('<table_name>/update', methods=['PUT'])
 def update_row(table_name):
 
-    if connection_dict.get('connection') is None or session.get('type') is None:
+    if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
 
 
 @database_routes.route('<table_name>/search', methods=['GET'])
 def search(table_name):
 
-    if connection_dict.get('connection') is None or session.get('type') is None:
+    if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
