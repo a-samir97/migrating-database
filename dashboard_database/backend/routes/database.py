@@ -123,8 +123,21 @@ def get_table_details(table_name):
 
     all_columns = cur.fetchall()
     # for react 
-    all_columns = [{'title': x} for x in all_columns ]
-    return jsonify(all_columns)
+    json_column = [{'title': x, 'dataIndex': x, 'key': x} for x in all_columns ]
+
+    cur.execute('SELECT * FROM %s;' % table_name)
+    all_data = cur.fetchall()
+
+    json_data = []
+    for i in range(0, len(all_data)):
+        data_dict = {}
+        data_dict['key'] = i
+        for j in range(0,len(all_columns)):
+            col_name = "".join(all_columns[j])
+            data_dict[col_name] = all_data[i][j]
+        json_data.append(data_dict)
+
+    return jsonify(json_column, json_data)
 
 
 @database_routes.route('<table_name>/insert', methods=['POST'])

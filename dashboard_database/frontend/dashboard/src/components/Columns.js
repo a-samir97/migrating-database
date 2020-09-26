@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Radio, Divider } from 'antd';
+import { Table } from 'antd';
 
 const data = [
   {
@@ -40,29 +40,17 @@ const rowSelection = {
 };
 
 export const ColumnsList = (props) => {
-  const [selectionType, setSelectionType] = useState('checkbox');
-  console.log(props.columns)
+  const [selectionType ] = useState('checkbox');
+  
   return (
     <div>
-      <Radio.Group
-        onChange={({ target: { value } }) => {
-          setSelectionType(value);
-        }}
-        value={selectionType}
-      >
-        <Radio value="checkbox">Checkbox</Radio>
-        <Radio value="radio">radio</Radio>
-      </Radio.Group>
-
-      <Divider />
-
       <Table
         rowSelection={{
           type: selectionType,
           ...rowSelection,
         }}
         columns={props.columns}
-        dataSource={data}
+        dataSource={props.data}
       />
     </div>
   );

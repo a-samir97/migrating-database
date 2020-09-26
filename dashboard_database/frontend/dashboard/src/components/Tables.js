@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu } from 'antd';
 import  { ColumnsList }  from './Columns';
 
 const { Header, Content, Sider } = Layout;
@@ -14,6 +14,7 @@ export class Table extends React.Component {
         collapsed: false,
         tables:[],
         columns:[],
+        data:[]
       }
     }
 
@@ -21,7 +22,6 @@ export class Table extends React.Component {
         axios.get('http://127.0.0.1:5000/db/all-tables')
         .then( 
             (response) => {
-                console.log(response.data);
                 this.setState({
                   tables:response.data
                 })
@@ -44,9 +44,9 @@ export class Table extends React.Component {
         axios.get(`http://127.0.0.1:5000/db/table-details/${columnName}`)
         .then((response)=>{
             this.setState({
-              columns:response.data
+              columns:response.data[0],
+              data:response.data[1]
             })
-
         })
         .catch((error)=>{
           console.log(error)
@@ -66,10 +66,8 @@ export class Table extends React.Component {
           <Layout>
           <Header className="header">
             <div className="logo" />
-            <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']}>
-              <Menu.Item key="1">nav 1</Menu.Item>
-              <Menu.Item key="2">nav 2</Menu.Item>
-              <Menu.Item key="3">nav 3</Menu.Item>
+            <Menu theme="dark" mode="horizontal">
+              <Menu.Item key="1">Database Dashboard</Menu.Item>
             </Menu>
           </Header>
 
@@ -88,11 +86,6 @@ export class Table extends React.Component {
               </Menu>
             </Sider>
             <Layout style={{ padding: '0 24px 24px' }}>
-              <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item>Home</Breadcrumb.Item>
-                <Breadcrumb.Item>List</Breadcrumb.Item>
-                <Breadcrumb.Item>App</Breadcrumb.Item>
-              </Breadcrumb>
               <Content
                 className="site-layout-background"
                 style={{
@@ -104,7 +97,7 @@ export class Table extends React.Component {
                 {
                 this.state.columns.length > 1
                 ?
-                 <ColumnsList columns={this.state.columns}></ColumnsList>
+                 <ColumnsList columns={this.state.columns} data={ this.state.data }></ColumnsList>
                 :
                 <p>Select Table to See Columns</p>
                 }

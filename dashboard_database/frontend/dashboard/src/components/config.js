@@ -1,6 +1,12 @@
-import { Form, Input, Button } from 'antd';
+import { Select, Form, Input, Button } from 'antd';
 import React from 'react'
 import { useHistory } from 'react-router-dom'
+
+const { Option } = Select;
+
+function onChange(value) {
+  console.log(`selected ${value}`);
+}
 
 const axios = require('axios').default;
 const layout = {
@@ -27,8 +33,7 @@ const Config = () => {
     // POST Method
     axios.post('http://127.0.0.1:5000/db/config', values)
     .then(function(response){
-        console.log(response)
-
+      
         history.push('/tables')
     })
     .catch(function (error){
@@ -62,7 +67,16 @@ const Config = () => {
           },
         ]}
       >
-        <Input />
+          <Select
+          showSearch
+          style={{ width: 200 }}
+          placeholder="Select your database"
+          onChange={onChange}
+        >
+          <Option value="postgres">postgres</Option>
+          <Option value="mariadb">mariadb</Option>
+          <Option value="mysql">mysql</Option>
+        </Select>
       </Form.Item>
 
       <Form.Item
