@@ -143,11 +143,25 @@ def get_table_details(table_name):
 
 
 @database_routes.route('<table_name>/insert', methods=['POST'])
+@cross_origin()
 def insert_row(table_name):
 
     if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
 
+    data = request.get_json()
+
+    cur = connection_dict['connection'].cursor()
+
+    columns = ",".join(data.keys())
+    values = ",".join(data.values())
+
+    cur.execute("INSERT INTO %s (%s) VALUES %s;" % (table_name, columns, tuple(data.values())))
+    
+    # to save changes
+    connection_dict.get('connection').commit()
+
+    return Response(status=201) # created !!
 
 @database_routes.route('<table_name>/delete/<id>', methods=['DELETE'])
 @cross_origin()
@@ -158,8 +172,6 @@ def delete_row(table_name, id):
 
     cur = connection_dict['connection'].cursor()
 
-    print(table_name, id)
-    print('\n\n\n\n')
     # get primary column
     cur.execute("SELECT c.column_name\
                 FROM information_schema.key_column_usage AS c\
