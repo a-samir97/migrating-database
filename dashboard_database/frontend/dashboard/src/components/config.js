@@ -1,8 +1,16 @@
-import { Select, Form, Input, Button } from 'antd';
+import { Select, Form, Input, Button, notification } from 'antd';
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 
 const { Option } = Select;
+
+const openNotificationWithIcon = (type, error) => {
+  notification[type]({
+    message: 'Error',
+    description: error
+  });
+};
+
 
 function onChange(value) {
   console.log(`selected ${value}`);
@@ -28,17 +36,20 @@ const tailLayout = {
 const Config = () => {
     
     const history = useHistory();
+
     const onFinish = (values) => {
-    console.log('Success:', values);
-    // POST Method
-    axios.post('http://127.0.0.1:5000/db/config', values)
-    .then(function(response){
-      
-        history.push('/tables')
-    })
-    .catch(function (error){
+    
+      console.log('Success:', values);
+      // POST Method
+      axios.post('http://127.0.0.1:5000/db/config', values)
+      .then(function(response){
+        
+          history.push('/tables')
+      })
+      .catch(function (error){
+        openNotificationWithIcon('error', "can not connect to the database, please try again")
         console.log(error)
-    })
+      })
   };
 
   const onFinishFailed = (errorInfo) => {

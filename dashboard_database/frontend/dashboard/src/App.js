@@ -7,7 +7,8 @@ function App() {
   return (
     <Switch>
       <Route path="/" component={ Config } exact></Route>
-      <Route path='/tables' component={ Table } exact></Route>
+      <Route path='/tables' component={ Table }></Route>
+      <Route path='/table/:name/' component={ Table }></Route>
     </Switch>
   );
 }

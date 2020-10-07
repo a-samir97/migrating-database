@@ -2,6 +2,9 @@ import React from 'react'
 import { Layout, Menu } from 'antd';
 import  { ColumnsList }  from './Columns';
 
+import { AddModal } from './AddModal'
+import { SearchModal } from './SearchModal'
+
 const { Header, Content, Sider } = Layout;
 
 const axios = require('axios').default
@@ -14,7 +17,8 @@ export class Table extends React.Component {
         collapsed: false,
         tables:[],
         columns:[],
-        data:[]
+        data:[],
+        tableName:''
       }
     }
 
@@ -37,16 +41,18 @@ export class Table extends React.Component {
         });
       };
 
-      HandleChange = (item)=> {
-        let columnName = item.key;
-
+      HandleChange = (item) => {
+        let tableName = item.key;
+        
         // call the API by axios
-        axios.get(`http://127.0.0.1:5000/db/table-details/${columnName}`)
+        axios.get(`http://127.0.0.1:5000/db/table-details/${tableName}`)
         .then((response)=>{
             this.setState({
               columns:response.data[0],
-              data:response.data[1]
-            })
+              data:response.data[1],
+              tableName:tableName
+            });
+            this.props.history.push(`/table/${tableName}/`);
         })
         .catch((error)=>{
           console.log(error)
@@ -94,13 +100,38 @@ export class Table extends React.Component {
                   minHeight: 280,
                 }}
               >
+
                 {
                 this.state.columns.length > 1
                 ?
-                 <ColumnsList columns={this.state.columns} data={ this.state.data }></ColumnsList>
+                <div>
+                    <AddModal 
+                      columns={ this.state.columns }
+                      tableName={ this.state.tableName }
+                    >
+                    </AddModal>
+
+                    <SearchModal 
+                      columns={ this.state.columns }
+                      tableName={ this.state.tableName }
+                    >
+
+                    </SearchModal>
+                    
+                    <hr></hr>
+                    
+                    <ColumnsList 
+                    
+                    columns={ this.state.columns } 
+                    data={ this.state.data } 
+                    tableName={ this.state.tableName }
+                    >
+                    </ColumnsList>
+                </div>            
                 :
                 <p>Select Table to See Columns</p>
                 }
+
               </Content>
             </Layout>
           </Layout>
