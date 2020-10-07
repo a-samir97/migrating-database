@@ -119,9 +119,11 @@ def get_table_details(table_name):
             table_name='%s';" % table_name)
 
     else:
-        cur.execute('SHOW COLUMNS FROM %s;' % table_name)
+        cur.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS \
+                    WHERE TABLE_NAME = '%s';" % table_name)
 
     all_columns = cur.fetchall()
+
     # for react 
     json_column = [{'title': x, 'dataIndex': x, 'key': x} for x in all_columns ]
 
@@ -147,12 +149,37 @@ def insert_row(table_name):
         return Response("There is something not valid, please make your configuration",status=400)
 
 
-@database_routes.route('<table_name>/delete', methods=['DELETE'])
-def delete_row(table_name):
+@database_routes.route('<table_name>/delete/<id>', methods=['DELETE'])
+@cross_origin()
+def delete_row(table_name, id):
 
     if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
 
+    cur = connection_dict['connection'].cursor()
+
+    print(table_name, id)
+    print('\n\n\n\n')
+    # get primary column
+    cur.execute("SELECT c.column_name\
+                FROM information_schema.key_column_usage AS c\
+                LEFT JOIN information_schema.table_constraints AS t\
+                ON t.constraint_name = c.constraint_name\
+                WHERE t.table_name = '%s' AND t.constraint_type = 'PRIMARY KEY';" % (table_name,))
+    
+    # fetch table 
+    get_primary_column = cur.fetchone()
+
+    if get_primary_column:
+        
+        # delete selected row
+        cur.execute("DELETE FROM %s WHERE %s=%s" % (table_name, get_primary_column[0], id))
+
+        # return response
+        return Response(status=204)
+    
+    # row not found
+    return Response(status=404)
 
 @database_routes.route('<table_name>/update', methods=['PUT'])
 def update_row(table_name):
