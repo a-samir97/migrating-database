@@ -156,12 +156,17 @@ def insert_row(table_name):
     columns = ",".join(data.keys())
     values = ",".join(data.values())
 
-    cur.execute("INSERT INTO %s (%s) VALUES %s;" % (table_name, columns, tuple(data.values())))
+    try:
+        # execute query
+        cur.execute("INSERT INTO %s (%s) VALUES %s;" % (table_name, columns, tuple(data.values())))
     
-    # to save changes
-    connection_dict.get('connection').commit()
+        # to save changes
+        connection_dict.get('connection').commit()
 
-    return Response(status=201) # created !!
+        # return response 201 
+        return Response(status=201) # created !!
+    except:
+        return Response(status=400)
 
 @database_routes.route('<table_name>/delete/<id>', methods=['DELETE'])
 @cross_origin()
@@ -187,6 +192,9 @@ def delete_row(table_name, id):
         # delete selected row
         cur.execute("DELETE FROM %s WHERE %s=%s" % (table_name, get_primary_column[0], id))
 
+        # to save changes
+        connection_dict.get('connection').commit()
+    
         # return response
         return Response(status=204)
     
