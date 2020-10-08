@@ -1,5 +1,6 @@
 import React from 'react'
 import { Modal, Button, Form, Input, Space } from 'antd';
+import { notificationBase } from './Notification';
 
 const axios = require('axios').default
 
@@ -38,6 +39,12 @@ export class AddModal extends React.Component {
     });
   };
 
+  disappearModal = () => {
+    this.setState({
+      visible:false,
+    });
+  }
+
   handleOk = e => {
     console.log(e);
     this.setState({
@@ -57,10 +64,17 @@ export class AddModal extends React.Component {
 
     axios.post(`http://127.0.0.1:5000/db/${this.props.tableName}/insert`, data)
     .then(response=>{
-      console.log(response)
+        // create success notification
+        notificationBase('success', 'Added Row', 'you added a new row successfully.');
+
+        // to make modal unvisible
+        this.disappearModal();
     })
     .catch(error => {
       console.log(error)
+      // creata danger notification
+      notificationBase('error', 'Add Row Error', 'the row doesnt not add to the database, please try again');
+
     })
   }
 
