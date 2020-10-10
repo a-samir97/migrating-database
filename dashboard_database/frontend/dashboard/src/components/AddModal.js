@@ -43,7 +43,7 @@ export class AddModal extends React.Component {
     this.setState({
       visible:false,
     });
-  }
+  };
 
   handleOk = e => {
     console.log(e);
