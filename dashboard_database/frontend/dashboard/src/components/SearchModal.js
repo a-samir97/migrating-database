@@ -62,20 +62,21 @@ export class SearchModal extends React.Component {
   onFinish = data => {
 
     // axios request to API
-    axios.put(`http://127.0.0.1:5000/db/${this.props.tableName}/update`, data)
+    axios.post(`http://127.0.0.1:5000/db/${this.props.tableName}/search`, data)
     .then(response=>{
       
         console.log(response)
 
         // create success notification
-        notificationBase('success', 'Added Row', 'you added a new row successfully.');
+        notificationBase('success', 'Searching Finished', 'searching is done.');
         // to make modal unvisible
         this.disappearModal();
     })
     .catch(error => {
+      console.log(data);
       console.log(error)
       // creata danger notification
-      notificationBase('error', 'Add Row Error', 'the row doesnt not add to the database, please try again');
+      notificationBase('error', 'Seaching Error', 'in valid search, please try again');
 
     })
   }
@@ -84,24 +85,6 @@ export class SearchModal extends React.Component {
       let columNames = []
       for (let i = 0; i < this.state.columns.length - 2; i++) {
 
-          // to get primary key 
-          if(i === 0){
-          columNames.push(
-              <Form.Item
-              id={this.state.columns[i]['title']}
-              key={ this.state.columns[i]['title'] }
-              label={ this.state.columns[i]['title'] }
-              name='primaryKey' 
-              rules={[
-              {
-                  message: `Please input your ${this.state.columns[i]['title'] }!`,
-              },
-              ]}
-          >
-                  <Input />
-          </Form.Item>
-      )
-          } else {
             columNames.push(
               <Form.Item
               key={ this.state.columns[i]['title'] }
@@ -115,10 +98,7 @@ export class SearchModal extends React.Component {
               >
                       <Input />
               </Form.Item>
-          )
-        }
-          
-          
+          )        
       }
     return (
     
