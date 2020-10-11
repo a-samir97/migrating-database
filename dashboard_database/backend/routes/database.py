@@ -202,14 +202,81 @@ def delete_row(table_name, id):
     return Response(status=404)
 
 @database_routes.route('<table_name>/update', methods=['PUT'])
+@cross_origin()
 def update_row(table_name):
 
     if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
 
+    # get requested data
+    data = request.get_json()
 
-@database_routes.route('<table_name>/search', methods=['GET'])
+    # cursor for execution query
+    cur = connection_dict['connection'].cursor()
+
+    # get primary column
+    cur.execute("SELECT c.column_name\
+                FROM information_schema.key_column_usage AS c\
+                LEFT JOIN information_schema.table_constraints AS t\
+                ON t.constraint_name = c.constraint_name\
+                WHERE t.table_name = '%s' AND t.constraint_type = 'PRIMARY KEY';" % (table_name,))
+    
+    # fetch table
+    get_primary_column = cur.fetchone()
+    
+    if get_primary_column:
+        
+        column_id = data['primaryKey']
+        del data['primaryKey']
+
+        # make string to pass it to the query
+        query_string = "" 
+        for key,value in data.items():
+            query_string += "%s='%s'," % (key, value)
+
+        try:
+            
+            # table name, (column=newfield), (id_column), id field 
+            cur.execute("UPDATE %s SET %s WHERE %s=%s" % (table_name, query_string[:-1], get_primary_column, column_id))
+        
+            # to save changes
+            connection_dict.get('connection').commit()
+        
+            # return response OKK
+            return Response(status=200)    
+
+        except:
+            return Response(status=400)
+    else:
+        return Response(status=400)
+
+
+@database_routes.route('<table_name>/search', methods=['POST'])
+@cross_origin()
 def search(table_name):
 
     if connection_dict.get('connection') is None or connection_dict.get('type') is None:
         return Response("There is something not valid, please make your configuration",status=400)
+
+    data = request.get_json()
+
+    # cursor for execution query
+    cur = connection_dict['connection'].cursor()
+
+    # to make query string to pass it 
+    query_string = ""
+    for key, value in data.items():
+        query_string += "%s='%s'," % (key, value)
+
+    try:
+        # execute query
+        cur.execute('SELECT * FROM %s WHERE %s;' % (table_name, query_string[:-1]))
+
+        # fetching 
+        all_data = cur.fetchall()
+
+        return jsonify(all_data)
+
+    except Exception as e:
+        print(e)
+        return Response(status=404)
