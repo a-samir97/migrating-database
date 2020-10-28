@@ -1,7 +1,8 @@
 from flask import Flask
 
 from migrate_tools.routes.employee import employees_routes
-from dashboard_database.backend.routes.database import database_routes
+
+#from dashboard_database.backend.routes.database import database_routes
 
 from migrate_tools.config.base_config import DockerDevelopmentConfig, LocalDevelopmentConfig, TestingConfig
 from migrate_tools.mongodb.init_db import db
@@ -25,7 +26,7 @@ else:
 
 db.init_app(app)
 
-app.register_blueprint(database_routes, url_prefix='/db/')
+#app.register_blueprint(database_routes, url_prefix='/db/')
 
 # employees routes 
 app.register_blueprint(employees_routes, url_prefix='/')
